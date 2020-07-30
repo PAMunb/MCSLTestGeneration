@@ -1,4 +1,4 @@
-package br.unb;
+package br.unb.cic.mcsl.test.plugin;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -24,58 +24,33 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Goal which touches a timestamp file.
+ * TestCase generator for MetaCrySL
  *
- * @goal touch
+ * @goal gentest
  * 
  * @phase process-sources
  */
-public class MyMojo
-    extends AbstractMojo
+public class MCSLTestGenerationPlugin extends AbstractMojo
 {
     /**
      * Location of the file.
-     * @parameter expression="${project.build.directory}"
+     * @parameter property="${project.build.directory}"
      * @required
      */
-    private File outputDirectory;
+    private File inputDirectory;
 
-    public void execute()
-        throws MojoExecutionException
+    public void execute()  throws MojoExecutionException
     {
-        File f = outputDirectory;
+        File f = inputDirectory;
 
-        if ( !f.exists() )
+        if ( f.exists() && f.isDirectory())
         {
-            f.mkdirs();
-        }
-
-        File touch = new File( f, "touch.txt" );
-
-        FileWriter w = null;
-        try
-        {
-            w = new FileWriter( touch );
-
-            w.write( "touch.txt" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Error creating file " + touch, e );
-        }
-        finally
-        {
-            if ( w != null )
-            {
-                try
-                {
-                    w.close();
-                }
-                catch ( IOException e )
-                {
-                    // ignore
-                }
+            for(File aFile: f.listFiles()) {
+                System.out.println(aFile.getAbsoluteFile());
             }
+        }
+        else {
+            throw new RuntimeException("Invalid path : " + f.getAbsolutePath());
         }
     }
 }
