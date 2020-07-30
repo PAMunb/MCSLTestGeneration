@@ -28,7 +28,7 @@ public class TestSuite  {
      * @throws Exception if any
      */
     @Test
-    public void testSomething() throws Exception
+    public void mcslTestGeneration() throws Exception
     {
         File pom = new File( "target/test-classes/unit/sample01/pom.xml" );
         Assert.assertNotNull(pom);
@@ -37,5 +37,8 @@ public class TestSuite  {
         MCSLTestGenerationPlugin plugin = (MCSLTestGenerationPlugin) rule.lookupMojo( "gentest", pom );
         Assert.assertNotNull( plugin );
         plugin.execute();
+
+        Assert.assertNotNull(plugin.getRules());
+        Assert.assertEquals(7, plugin.getRules().size());
     }
 }

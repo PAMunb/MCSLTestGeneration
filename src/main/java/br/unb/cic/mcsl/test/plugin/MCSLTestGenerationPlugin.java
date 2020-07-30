@@ -22,6 +22,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TestCase generator for MetaCrySL
@@ -38,6 +40,7 @@ public class MCSLTestGenerationPlugin extends AbstractMojo
      * @required
      */
     private File inputDirectory;
+    private List<File> rules;
 
     public void execute()  throws MojoExecutionException
     {
@@ -45,12 +48,18 @@ public class MCSLTestGenerationPlugin extends AbstractMojo
 
         if ( f.exists() && f.isDirectory())
         {
+            rules = new ArrayList<File>();
             for(File aFile: f.listFiles()) {
                 System.out.println(aFile.getAbsoluteFile());
+                rules.add(aFile);
             }
         }
         else {
             throw new RuntimeException("Invalid path : " + f.getAbsolutePath());
         }
+    }
+
+    public List<File> getRules() {
+        return rules;
     }
 }
