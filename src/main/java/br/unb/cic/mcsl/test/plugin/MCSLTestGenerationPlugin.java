@@ -22,8 +22,22 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import freemarker.core.ParseException;
+import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
+import freemarker.template.TemplateNotFoundException;
+import freemarker.template.Version;
 
 /**
  * TestCase generator for MetaCrySL
@@ -40,7 +54,7 @@ public class MCSLTestGenerationPlugin extends AbstractMojo
      * @required
      */
     private File inputDirectory;
-    private List<File> rules;
+    private List<TestObject> rules;
 
     public void execute()  throws MojoExecutionException
     {
@@ -48,18 +62,53 @@ public class MCSLTestGenerationPlugin extends AbstractMojo
 
         if ( f.exists() && f.isDirectory())
         {
-            rules = new ArrayList<File>();
+        	Map<String, Object> input = new HashMap<String, Object>();
+        	rules = new ArrayList<TestObject>();
+            
+            Configuration cfg = new Configuration();
+            cfg.setClassForTemplateLoading(MCSLTestGenerationPlugin.class, "/templates");
+            // Configuration
+            cfg.setIncompatibleImprovements(new Version(2, 3, 20));
+            cfg.setDefaultEncoding("UTF-8");
+            cfg.setLocale(Locale.US);
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            
+            
             for(File aFile: f.listFiles()) {
-                System.out.println(aFile.getAbsoluteFile());
-                rules.add(aFile);
+            	rules.add(new TestObject(aFile.getName(), aFile.getAbsolutePath()));
             }
+            input.put("rules", rules);
+            
+            // Load template
+            try {
+				Template template = cfg.getTemplate("testTemplate.ftl");
+				// Generate output to console
+		        Writer consoleWriter = new OutputStreamWriter(System.out);
+		        template.process(input, consoleWriter);
+		        Writer fileWriter = new FileWriter(new File("MetaCrySLParsingTest.xtend"));
+		        try {
+		            template.process(input, fileWriter);
+		        } finally {
+		            fileWriter.close();
+		        }
+			} catch (TemplateNotFoundException e) {
+				e.printStackTrace();
+			} catch (MalformedTemplateNameException e) {
+				e.printStackTrace();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (TemplateException e) {
+				e.printStackTrace();
+			}
         }
         else {
             throw new RuntimeException("Invalid path : " + f.getAbsolutePath());
         }
     }
 
-    public List<File> getRules() {
+    public List<TestObject> getRules() {
         return rules;
     }
 }
