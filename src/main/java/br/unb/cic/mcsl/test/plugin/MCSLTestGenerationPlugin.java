@@ -81,27 +81,14 @@ public class MCSLTestGenerationPlugin extends AbstractMojo
             
             // Load template
             try {
-				Template template = cfg.getTemplate("testTemplate.ftl");
-				// Generate output to console
-		        Writer consoleWriter = new OutputStreamWriter(System.out);
-		        template.process(input, consoleWriter);
-		        Writer fileWriter = new FileWriter(new File("MetaCrySLParsingTest.xtend"));
-		        try {
-		            template.process(input, fileWriter);
-		        } finally {
-		            fileWriter.close();
-		        }
-			} catch (TemplateNotFoundException e) {
-				e.printStackTrace();
-			} catch (MalformedTemplateNameException e) {
-				e.printStackTrace();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (TemplateException e) {
-				e.printStackTrace();
-			}
+            	Template template = cfg.getTemplate("testTemplate.ftl");
+            	// Generate output to console
+            	Writer consoleWriter = new OutputStreamWriter(System.out);
+            	template.process(input, consoleWriter);
+            	Writer fileWriter = new FileWriter(new File("MetaCrySLParsingTest.xtend"));
+            } catch (Exception e) {
+            	e.printStackTrace();
+            }
         }
         else {
             throw new RuntimeException("Invalid path : " + f.getAbsolutePath());
