@@ -17,11 +17,11 @@ package br.unb.cic.mcsl.test.plugin;
  */
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -30,13 +30,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import freemarker.core.ParseException;
 import freemarker.template.Configuration;
-import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import freemarker.template.TemplateNotFoundException;
 import freemarker.template.Version;
 
 /**
@@ -49,18 +45,26 @@ import freemarker.template.Version;
 public class MCSLTestGenerationPlugin extends AbstractMojo
 {
     /**
-     * Location of the file.
-     * @parameter property="${project.build.directory}"
+     * Location of the CrySL rules.
+     * @parameter property="${project.build.input}"
      * @required
      */
     private File inputDirectory;
+
+    /**
+     * Location of the output directory.
+     * @parameter property="${project.build.output}"
+     * @required
+     */
+    private File outputDirectory;
+
     private List<TestObject> rules;
 
     public void execute()  throws MojoExecutionException
     {
         File f = inputDirectory;
 
-        if ( f.exists() && f.isDirectory())
+        if (f.exists() && f.isDirectory())
         {
         	Map<String, Object> input = new HashMap<String, Object>();
         	rules = new ArrayList<TestObject>();
@@ -78,20 +82,28 @@ public class MCSLTestGenerationPlugin extends AbstractMojo
             	rules.add(new TestObject(aFile.getName(), aFile.getAbsolutePath()));
             }
             input.put("rules", rules);
-            
-            // Load template
             try {
             	Template template = cfg.getTemplate("testTemplate.ftl");
-            	// Generate output to console
-            	Writer consoleWriter = new OutputStreamWriter(System.out);
-            	template.process(input, consoleWriter);
-            	Writer fileWriter = new FileWriter(new File("MetaCrySLParsingTest.xtend"));
+            	File absolutePath = new File(outputDirectory.getAbsoluteFile() + "/br/unb/cic/mcsl/tests/");
+
+            	if(!absolutePath.exists()) {
+            	    absolutePath.mkdirs();
+                }
+
+            	if(absolutePath.isDirectory()) {
+                    Writer fileWriter = new FileWriter(new File(absolutePath.getAbsoluteFile() + "/MetaCrySLParsingTest.xtend"));
+                    template.process(input, fileWriter);
+                    fileWriter.close();
+                }
+            	else {
+                    throw new MojoExecutionException("Could not generate code at" + absolutePath.getAbsolutePath());
+                }
             } catch (Exception e) {
-            	e.printStackTrace();
+            	throw new MojoExecutionException(e.getMessage());
             }
         }
         else {
-            throw new RuntimeException("Invalid path : " + f.getAbsolutePath());
+            throw new MojoExecutionException("Invalid path : " + f.getAbsolutePath());
         }
     }
 

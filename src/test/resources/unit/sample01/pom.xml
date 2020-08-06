@@ -22,6 +22,7 @@
                 <artifactId>MCSLTestGeneration</artifactId>
                 <configuration>
                     <inputDirectory>target/test-classes/unit/sample01/rules/</inputDirectory>
+                    <outputDirectory>src-gen/</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
