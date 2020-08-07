@@ -5,12 +5,12 @@ import org.apache.commons.io.FilenameUtils;
 public class TestObject {
 	private String name;
 	private String path;
-	private String filePath;
+	private String fileName;
 	
-    public TestObject(String name, String path) {
-        this.name = FilenameUtils.removeExtension(name);
-        this.path = path;
-        this.filePath = name;
+    public TestObject(String fileName, String path) {
+        this.name = FilenameUtils.removeExtension(fileName);
+        this.path = FilenameUtils.getFullPath(path);
+        this.fileName = fileName;
     }
 
     public String getName() {
@@ -21,7 +21,7 @@ public class TestObject {
         return path;
     }
     
-    public String getFilePath() {
-    	return filePath;
+    public String getFileName() {
+    	return fileName;
     }
 }

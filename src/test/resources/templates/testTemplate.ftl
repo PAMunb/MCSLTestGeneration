@@ -13,12 +13,12 @@ class MetaCrySLParsingTest extends MetaCrySLAbstractTests {
 	<#list rules as rule>
 	@Test
 	def void ${rule.name}() {
-		val file = super.readFileIntoString(${rule.path} + "${rule.filePath}")
+		val file = super.readFileIntoString(BR_UNB_CIC_METACRYSL_TESTS_FILES + "${rule.fileName}")
 		
 		val result = super.parseHelper.parse(file)
 		Assert.assertNotNull(result)
 		val errors = result.eResource.errors
-		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', !errors.isEmpty)
+		Assert.assertTrue('''Unexpected errors: «errors.join(", ")»''', errors.isEmpty)
 	}
 	</#list>
 }
