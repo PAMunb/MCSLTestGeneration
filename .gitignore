@@ -2,7 +2,9 @@
 .classpath
 .project
 .settings/
- 
+
+src-gen/
+
 # Intellij
 .idea/
 *.iml
